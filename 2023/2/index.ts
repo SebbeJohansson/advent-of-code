@@ -36,15 +36,10 @@ class Game {
 
 let data: string = fs.readFileSync('input', 'utf8');
 
-// const games: Game[] = [];
-
 const gameIdExtractor = /Game (?<gameid>\d*): /ig;
-const roundExtractor = /(?<cubecount>\d*) (?<cubecolor>red|blue|green)/ig;
 const games = data.split('\n').map((line) => {
-  // console.log(line);
   let internalGame = new Game(0, []);
   const lineWithoutGameId = line.replace(gameIdExtractor, (match, captureGroup) => {
-    // console.log(match, captureGroup);
     internalGame.id = parseInt(captureGroup);
     return '';
   });
@@ -56,7 +51,6 @@ const games = data.split('\n').map((line) => {
         const count = parseInt(setString);
         const color = setString.replace(count.toString(), '').trim() as keyof typeof Color;
         const set = new Set(count, Color[color]);
-        console.log(set);
         return set;
       });
     internalGame.rounds.push(new Round(sets));
@@ -65,34 +59,45 @@ const games = data.split('\n').map((line) => {
 });
 
 let gamesPossibleSum = 0;
+let gamesTotalPower = 0;
 games.forEach((game) => {
-  // console.log(game.id);
   let gameImpossible = false;
+  let highestCountOfRed = 0;
+  let highestCountOfGreen = 0;
+  let highestCountOfBlue = 0;
   game.rounds.forEach((round) => {
-    // console.log(round);
     round.sets.forEach((set) => {
-      // console.log(Color[set.color], set.count);
       if (Color[set.color] === 'red') {
         if (set.count > 12) {
           gameImpossible = true;
+        }
+        if (set.count > highestCountOfRed) {
+          highestCountOfRed = set.count;
         }
       }
       else if (Color[set.color] === 'green') {
         if (set.count > 13) {
           gameImpossible = true;
         }
+        if (set.count > highestCountOfGreen) {
+          highestCountOfGreen = set.count;
+        }
       }
       else if (Color[set.color] === 'blue') {
         if (set.count > 14) {
           gameImpossible = true;
         }
+        if (set.count > highestCountOfBlue) {
+          highestCountOfBlue = set.count;
+        }
       }
     });
   });
+  gamesTotalPower += highestCountOfRed * highestCountOfGreen * highestCountOfBlue;
   if (!gameImpossible) {
-    console.log(`Game ${game.id} is possible`);
     gamesPossibleSum += game.id;
   }
 });
 console.log(gamesPossibleSum);
+console.log(gamesTotalPower);
 // console.log(games);
