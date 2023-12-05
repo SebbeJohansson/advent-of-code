@@ -29,8 +29,6 @@ const seedPairs: number[][] = seeds.reduce((result: number[][], value, index, ar
     result.push(seeds.slice(index, index + 2));
   return result;
 }, []);
-console.log(seeds);
-console.log(seedPairs);
 const rows = lines.map(line => line.split('\n'));
 const mapGroups: Map[][] = [];
 rows.forEach((row, rowIndex) => {
@@ -40,36 +38,70 @@ rows.forEach((row, rowIndex) => {
   /* Go through each value and add map to group */
   rowValues.forEach((values) => {
     const map = new Map(rowType, values.split(' '));
-    console.log(rowIndex);
+    // console.log(rowIndex);
     mapGroups[rowIndex].push(map);
   });
 });
 
 /* Get all locations */
-const locations = seeds.map((seed) => {
-  let output = seed;
+const locations: number[] = [];
+seedPairs.forEach(([startOfSeedRange, seedRangeLength]) => {
+  // const seedLocationsInRange: number[] = [];
+  // console.log(startOfSeedRange, seedRangeLength);
+  for (let seed = startOfSeedRange; seed <= startOfSeedRange + seedRangeLength; seed++) {
+    // console.log('seed:', seed);
+    let output = seed;
 
-  /* Loop through each map type. */
-  for (let i = 0; i < mapGroups.length; i++) {
-    const mapGroup = mapGroups[i];
+    /* Loop through each map type. */
+    for (let i = 0; i < mapGroups.length; i++) {
+      const mapGroup = mapGroups[i];
 
-    /* Loop through each value in map. */
-    for (let j = 0; j < mapGroup.length; j++) {
-      const map = mapGroup[j];
-      if (map.isInMapRange(output)) {
-        output = output + map.destinationRangeStart - map.sourceRangeStart;
+      /* Loop through each value in map. */
+      for (let j = 0; j < mapGroup.length; j++) {
+        const map = mapGroup[j];
+        if (map.isInMapRange(output)) {
+          output = output + map.destinationRangeStart - map.sourceRangeStart;
 
-        /* Leave the for-loop because seed is not equal to output. */
-        if (seed !== output) {
-          console.log('seed:', seed);
-          console.log('output:', output);
-          break;
+          /* Leave the for-loop because seed is not equal to output. */
+          if (seed !== output) {
+            // console.log('seed:', seed);
+            // console.log('output:', output);
+            break;
+          }
         }
       }
     }
+    // seedLocationsInRange.push(output);
+    locations.push(output);
   }
-  return output;
+  // console.log('seed locations in range:', seedLocationsInRange);
 });
+console.log(locations);
+
+// const locations = seeds.map((seed) => {
+//   let output = seed;
+
+//   /* Loop through each map type. */
+//   for (let i = 0; i < mapGroups.length; i++) {
+//     const mapGroup = mapGroups[i];
+
+//     /* Loop through each value in map. */
+//     for (let j = 0; j < mapGroup.length; j++) {
+//       const map = mapGroup[j];
+//       if (map.isInMapRange(output)) {
+//         output = output + map.destinationRangeStart - map.sourceRangeStart;
+
+//         /* Leave the for-loop because seed is not equal to output. */
+//         if (seed !== output) {
+//           console.log('seed:', seed);
+//           console.log('output:', output);
+//           break;
+//         }
+//       }
+//     }
+//   }
+//   return output;
+// });
 
 const lowestLocationNumber = Math.min(...locations);
 console.log('Lowest location number:', lowestLocationNumber);
